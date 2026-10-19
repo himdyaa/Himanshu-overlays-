@@ -24,15 +24,16 @@
         </div>
         <div class="note"><b>Checkerboard = transparent.</b> In OBS this area shows your game/camera feed — only the overlay graphics appear.</div>
         <div class="panel" style="margin-top:20px">
-          <h3>📺 OBS Browser Source links</h3>
-          <label style="font-size:13px;color:var(--mut);font-weight:600">VIEW link — paste as Browser Source URL (audience sees this):</label>
-          <div class="urlbox" id="url-view"></div>
-          <div class="copyrow"><button class="btn sm" onclick="copyUrl('view')">Copy view link</button></div>
-          <label style="font-size:13px;color:var(--mut);font-weight:600">CONTROL link — same overlay + control buttons (OBS → right-click source → Interact):</label>
+          <h3>🎛️ Controller link</h3>
+          <p style="color:var(--mut);font-size:14px;margin-bottom:6px">Ye link kholo — customize karo, live operate karo, aur <b>usi page se viewer link generate</b> karo (dock me "📋 Copy viewer link" button).</p>
           <div class="urlbox" id="url-control"></div>
-          <div class="copyrow"><button class="btn sm" onclick="copyUrl('control')">Copy control link</button></div>
+          <div class="copyrow"><button class="btn sm" onclick="copyUrl('control')">Copy controller link</button></div>
+          <h3 style="margin-top:18px">📺 Viewer link (OBS ke liye)</h3>
+          <p style="color:var(--mut);font-size:14px;margin-bottom:6px">Seedha OBS me Browser source ki tarah paste karo. Controller page se bhi generate ho jayegi.</p>
+          <div class="urlbox" id="url-view"></div>
+          <div class="copyrow"><button class="btn sm ghost" onclick="copyUrl('view')">Copy viewer link</button></div>
         </div>
-        <div class="note"><b>OBS setup:</b> Sources → + → Browser → paste the <b>view</b> link → set Width 1920, Height 1080 → OK. To operate live scores, use the <b>control</b> link instead, then right-click the source → <b>Interact</b> and click the buttons. Your settings auto-save in the browser.</div>
+        <div class="note"><b>Setup:</b> ① Controller link kholo → customize karo. ② Dock me <b>📋 Copy viewer link</b> dabao. ③ OBS → Sources → + → Browser → viewer link paste karo → 1920×1080. ④ Live operate: OBS me source par right-click → <b>Interact</b> → keyboard dabao (cricket: 1/2/3/4/6, W, B • football: H, A, Space • lower third: S). Settings auto-save hoti hain.</div>
       </div>
       <div class="panel">
         <h3>⚙️ Customize</h3>

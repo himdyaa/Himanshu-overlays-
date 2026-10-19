@@ -195,12 +195,62 @@ function tickClock(){
 }
 function renderDock(){
   var dock = document.getElementById("dock");
-  dock.innerHTML = '<div class="ctl-head">🎛️ '+esc(TYPE.toUpperCase())+' CONTROL <span class="ctl-hint">OBS → right-click source → Interact</span></div>' +
+  var hints = { cricket:"Keys: 1/2/3/4/6 runs • W wicket • B ball",
+    football:"Keys: H home goal • A away goal • Space clock",
+    lowerthird:"Key: S show/hide", countdown:"Key: Space start/pause",
+    ticker:"", livebug:"" };
+  dock.innerHTML = '<div class="ctl-head">🎛️ '+esc(TYPE.toUpperCase())+' CONTROL</div>' +
+    '<div class="ctl-row"><button class="ctl-btn primary" id="copyViewer">📋 Copy viewer link</button>' +
+    '<button class="ctl-btn" id="copyCtl">📋 Copy controller link</button>' +
+    '<span class="ctl-hint">Viewer link → paste in OBS as Browser source. '+(hints[TYPE]||"")+'</span></div>' +
     '<div class="ctl-body">'+((C[TYPE]||C.cricket)())+'</div>';
   dock.querySelectorAll("[data-act]").forEach(function(b){
     b.addEventListener("click", function(){ act(b.getAttribute("data-act")); });
   });
+  document.getElementById("copyViewer").addEventListener("click", copyViewerLink);
+  document.getElementById("copyCtl").addEventListener("click", function(){
+    copyText(location.href, document.getElementById("copyCtl"));
+  });
 }
+function stateToParams(withControl){
+  var s = new URLSearchParams();
+  s.set("type", TYPE); s.set("profile", PROFILE);
+  for (var k in S){ if (S[k]!=="" && S[k]!=null) s.set(k, S[k]); }
+  if (withControl) s.set("control","1");
+  return s.toString();
+}
+function copyText(t, btnEl){
+  function done(ok){ if(btnEl){ var o=btnEl.textContent; btnEl.textContent = ok?"Copied ✓":"Copy failed"; setTimeout(function(){btnEl.textContent=o;},1600);} }
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).then(function(){done(true);}, function(){ fallback(); });
+  } else fallback();
+  function fallback(){ try{ window.prompt("Copy this link:", t); done(true); }catch(e){ done(false); } }
+}
+function copyViewerLink(){
+  var url = location.href.split("?")[0] + "?" + stateToParams(false);
+  copyText(url, document.getElementById("copyViewer"));
+}
+/* keyboard control — works on the clean viewer page too (OBS → Interact → press keys) */
+document.addEventListener("keydown", function(e){
+  var tag = (e.target && e.target.tagName) || "";
+  if (tag==="INPUT" || tag==="TEXTAREA" || tag==="SELECT") return;
+  var k = e.key.toLowerCase();
+  var handled = true;
+  if (TYPE==="cricket"){
+    if (k==="1") act("r1"); else if (k==="2") act("r2"); else if (k==="3") act("r3");
+    else if (k==="4") act("r4"); else if (k==="6") act("r6");
+    else if (k==="w") act("wk"); else if (k==="b") act("ball"); else if (k==="u") act("uw");
+    else if (k==="i") act(S.inn===1?"i2":"i1"); else handled=false;
+  } else if (TYPE==="football"){
+    if (k==="h") act("hg"); else if (k==="a") act("ag"); else if (k===" "){ act("clk"); e.preventDefault(); }
+    else handled=false;
+  } else if (TYPE==="lowerthird"){
+    if (k==="s") act("toggle"); else handled=false;
+  } else if (TYPE==="countdown"){
+    if (k===" "){ act("tog"); e.preventDefault(); } else handled=false;
+  } else handled=false;
+  if (handled) e.preventDefault();
+});
 function val(id){ var el=document.getElementById(id); return el?el.value:""; }
 
 function addBall(){ S.balls++; if (S.balls>5){ S.balls=0; S.ovr++; } }

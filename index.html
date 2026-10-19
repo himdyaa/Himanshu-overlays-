@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StreamOverlays — Free live overlays for streaming</title>
+<meta name="description" content="Free, customizable, real-time graphic overlays for OBS, Streamlabs, vMix and more. Scorebugs, lower thirds, tickers, countdowns — no account, no subscription.">
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="site">
+<header class="nav"><div class="wrap nav-in">
+  <div class="logo">Stream<b>Overlays</b></div>
+  <div class="nav-links"><a href="#library">Library</a><a href="#how">How it works</a><a class="btn sm" href="#library" style="color:#fff">Get overlays</a></div>
+</div></header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>Pro overlays for your stream.<br><span>100% free. Forever.</span></h1>
+    <p>Scoreboards, lower thirds, tickers and countdowns that update in real time — straight into OBS as a browser source. No account, no watermark, no subscription.</p>
+    <div class="hero-cta">
+      <a class="btn" href="#library">Browse overlays</a>
+      <a class="btn ghost" href="#how">How it works</a>
+    </div>
+    <div class="badges">
+      <span class="badge"><b>✓</b> Works with OBS</span>
+      <span class="badge"><b>✓</b> Works with Streamlabs</span>
+      <span class="badge"><b>✓</b> Works with vMix</span>
+      <span class="badge"><b>✓</b> No sign-up</span>
+    </div>
+  </section>
+
+  <section class="sec" id="library">
+    <h2>Overlay library</h2>
+    <p class="sub">Pick one, customize it, paste the link into OBS. Done.</p>
+    <div class="grid" id="cards"></div>
+  </section>
+
+  <section class="sec" id="how">
+    <h2>How it works</h2>
+    <p class="sub">Live in under a minute.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Pick an overlay</h3><p>Choose a scorebug, lower third, ticker or countdown from the library above.</p></div>
+      <div class="step"><div class="n">2</div><h3>Customize it</h3><p>Set team names, colors, headlines and text. See a live preview as you type.</p></div>
+      <div class="step"><div class="n">3</div><h3>Paste into OBS</h3><p>Copy the link → OBS Sources → <code>+</code> → Browser → paste URL → set 1920×1080. For live control, use the control link and right-click → <b>Interact</b>.</p></div>
+    </div>
+  </section>
+</div>
+
+<footer>StreamOverlays — free forever. Made for streamers, by a streamer.</footer>
+
+<script>
+var LIB = [
+  { type:"cricket", name:"Cricket Scorebug", desc:"Live cricket scorecard with runs, wickets, overs and CRR. Click +1/+4/+6/W in the control panel.",
+    demo:"type=cricket&home=IND&away=PAK&fresh=1" },
+  { type:"football", name:"Football Scorebug", desc:"Match score with a live running clock. Start, pause and adjust from the control panel.",
+    demo:"type=football&home=IND&away=PAK&fresh=1" },
+  { type:"lowerthird", name:"Lower Third", desc:"Animated name + title banner for anchors and guests. Show or hide it live.",
+    demo:"type=lowerthird&name=Rahul Sharma&title=Host, Evening Show&fresh=1" },
+  { type:"ticker", name:"Breaking News Ticker", desc:"Scrolling headline ticker pinned to the bottom of your stream.",
+    demo:"type=ticker&label=BREAKING&heads=India wins the thriller by 5 wickets&fresh=1" },
+  { type:"countdown", name:"Countdown Timer", desc:"'Starting soon' screen with a big, bold live countdown.",
+    demo:"type=countdown&title=Stream starts in&mins=10&fresh=1" },
+  { type:"livebug", name:"LIVE Bug", desc:"Pulsing LIVE indicator for the corner of your stream.",
+    demo:"type=livebug&text=LIVE&fresh=1" }
+];
+var g = document.getElementById("cards");
+LIB.forEach(function(o){
+  var d = document.createElement("div");
+  d.className = "card";
+  d.innerHTML =
+    '<div class="preview"><iframe loading="lazy" src="overlay.html?'+o.demo+'" title="'+o.name+' preview"></iframe></div>' +
+    '<div class="card-body"><h3>'+o.name+'</h3><p>'+o.desc+'</p>' +
+    '<div class="card-actions"><a class="btn sm" href="studio.html?type='+o.type+'">Customize →</a></div></div>';
+  g.appendChild(d);
+});
+</script>
+</body>
+</html>

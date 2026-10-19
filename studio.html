@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customize Overlay — StreamOverlays</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="site">
+<header class="nav"><div class="wrap nav-in">
+  <div class="logo">Stream<b>Overlays</b></div>
+  <div class="nav-links"><a href="index.html">Library</a><a href="index.html#how">How it works</a></div>
+</div></header>
+
+<div class="wrap">
+  <a class="back" href="index.html">← Back to library</a>
+  <div class="sec" style="padding-top:0">
+    <h2 id="ovl-title">Customize</h2>
+    <p class="sub" id="ovl-desc"></p>
+    <div class="studio">
+      <div>
+        <div class="stage-box" style="background:repeating-conic-gradient(#1a1f38 0% 25%, #12162c 0% 50%) 0 0/40px 40px">
+          <iframe id="preview" title="Overlay preview"></iframe>
+        </div>
+        <div class="note"><b>Checkerboard = transparent.</b> In OBS this area shows your game/camera feed — only the overlay graphics appear.</div>
+        <div class="panel" style="margin-top:20px">
+          <h3>📺 OBS Browser Source links</h3>
+          <label style="font-size:13px;color:var(--mut);font-weight:600">VIEW link — paste as Browser Source URL (audience sees this):</label>
+          <div class="urlbox" id="url-view"></div>
+          <div class="copyrow"><button class="btn sm" onclick="copyUrl('view')">Copy view link</button></div>
+          <label style="font-size:13px;color:var(--mut);font-weight:600">CONTROL link — same overlay + control buttons (OBS → right-click source → Interact):</label>
+          <div class="urlbox" id="url-control"></div>
+          <div class="copyrow"><button class="btn sm" onclick="copyUrl('control')">Copy control link</button></div>
+        </div>
+        <div class="note"><b>OBS setup:</b> Sources → + → Browser → paste the <b>view</b> link → set Width 1920, Height 1080 → OK. To operate live scores, use the <b>control</b> link instead, then right-click the source → <b>Interact</b> and click the buttons. Your settings auto-save in the browser.</div>
+      </div>
+      <div class="panel">
+        <h3>⚙️ Customize</h3>
+        <div id="fields"></div>
+        <button class="btn" style="width:100%" onclick="applyAll()">Update preview & links</button>
+      </div>
+    </div>
+  </div>
+</div>
+<footer>StreamOverlays — free forever. No account, no subscription.</footer>
+
+<script>
+var qs = new URLSearchParams(location.search);
+var TYPE = qs.get("type") || "cricket";
+var BASE = location.href.split("?")[0].replace(/studio\.html$/, "");
+
+var META = {
+  cricket:   { name:"Cricket Scorebug", desc:"Live cricket scorecard — runs, wickets, overs, CRR. Control it live from OBS." },
+  football:  { name:"Football Scorebug", desc:"Match score with live clock. Start/pause the timer from the control panel." },
+  lowerthird:{ name:"Lower Third", desc:"Name + title banner for anchors, guests and reporters. Show/hide with animation." },
+  ticker:    { name:"Breaking News Ticker", desc:"Scrolling headline ticker for the bottom of your stream." },
+  countdown: { name:"Countdown Timer", desc:"'Starting soon' screen with a big live countdown." },
+  livebug:   { name:"LIVE Bug", desc:"Pulsing LIVE indicator for the corner of your stream." }
+};
+var FIELDS = {
+  cricket:   [["home","Home team","text"],["away","Away team","text"],["title","Title (optional)","text"],["hc","Home color","color"],["ac","Away color","color"]],
+  football:  [["home","Home team","text"],["away","Away team","text"],["title","Title (optional)","text"],["hc","Home color","color"],["ac","Away color","color"]],
+  lowerthird:[["name","Name","text"],["title","Subtitle","text"],["accent","Accent color","color"],["theme","Theme","select:dark,light"]],
+  ticker:    [["label","Label","text"],["heads","Headlines (one per line)","textarea"],["speed","Scroll speed (5-120)","number"],["bg","Background","color"],["labelbg","Label background","color"],["fg","Text color","color"]],
+  countdown: [["title","Title","text"],["mins","Minutes","number"],["accent","Accent color","color"]],
+  livebug:   [["text","Text","text"],["size","Size (16-120)","number"],["color","Color","color"]]
+};
+var DEFAULTS = {
+  cricket:{home:"IND",away:"PAK",hc:"#1a73e8",ac:"#e8212d",title:""},
+  football:{home:"IND",away:"PAK",hc:"#1a73e8",ac:"#e8212d",title:""},
+  lowerthird:{name:"Your Name",title:"Your Title",accent:"#e8212d",theme:"dark"},
+  ticker:{label:"BREAKING",heads:"Headline one\nHeadline two",speed:40,bg:"#b30000",labelbg:"#111111",fg:"#ffffff"},
+  countdown:{title:"Stream starts in",mins:10,accent:"#e8212d"},
+  livebug:{text:"LIVE",size:34,color:"#e8212d"}
+};
+
+document.getElementById("ovl-title").textContent = "Customize — " + (META[TYPE]?META[TYPE].name:TYPE);
+document.getElementById("ovl-desc").textContent = META[TYPE]?META[TYPE].desc:"";
+
+var wrap = document.getElementById("fields");
+(FIELDS[TYPE]||[]).forEach(function(f){
+  var key=f[0], lab=f[1], kind=f[2], def=(DEFAULTS[TYPE]||{})[key];
+  var html = '<div class="field"><label>'+lab+'</label>';
+  if (kind==="textarea") html += '<textarea id="sf-'+key+'" rows="4">'+def+'</textarea>';
+  else if (kind.indexOf("select:")===0){
+    var opts = kind.slice(7).split(",");
+    html += '<select id="sf-'+key+'">' + opts.map(function(o){return '<option value="'+o+'"'+(o===def?" selected":"")+'>'+o+'</option>';}).join("") + '</select>';
+  }
+  else html += '<input id="sf-'+key+'" type="'+kind+'" value="'+def+'">';
+  html += '</div>';
+  wrap.insertAdjacentHTML("beforeend", html);
+});
+
+function collect(){
+  var p = { type: TYPE };
+  (FIELDS[TYPE]||[]).forEach(function(f){
+    var el = document.getElementById("sf-"+f[0]);
+    if (el) p[f[0]] = el.value;
+  });
+  return p;
+}
+function buildUrl(extra){
+  var p = collect();
+  var s = new URLSearchParams();
+  for (var k in p) if (p[k]!==""&&p[k]!=null) s.set(k, p[k]);
+  if (extra) for (var k2 in extra) s.set(k2, extra[k2]);
+  return BASE + "overlay.html?" + s.toString();
+}
+function refresh(){
+  document.getElementById("preview").src = buildUrl({fresh:"1"});
+  document.getElementById("url-view").textContent = buildUrl({});
+  document.getElementById("url-control").textContent = buildUrl({control:"1"});
+}
+function applyAll(){ refresh(); }
+function copyUrl(which){
+  var t = document.getElementById(which==="view"?"url-view":"url-control").textContent;
+  navigator.clipboard.writeText(t).then(function(){ alert("Copied! Paste it in OBS as a Browser source."); });
+}
+refresh();
+</script>
+</body>
+</html>
